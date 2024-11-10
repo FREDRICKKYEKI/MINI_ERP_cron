@@ -4,9 +4,9 @@
   "description": "Contains cron job(s) for the MINI ERP project.",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node dist/test.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx nodemon"
+    "dev": "tsc && npx nodemon"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { VirtualDatabase } from "./db";
+import { ENVS } from "./config";
 
 // Configure nodemailer transporter if actually sending emails
 /**
@@ -7,10 +8,10 @@ import { VirtualDatabase } from "./db";
  * NOTE: To use this, you need to enable "Less secure app access" in your Gmail account
  */
 export const transporter = nodemailer.createTransport({
-  service: "gmail",
+  service: "roundcube",
   auth: {
-    user: "your_email@gmail.com",
-    pass: "your_password",
+    user: ENVS.CRON_EMAIL,
+    pass: ENVS.CRON_EMAIL_PASSWORD,
   },
 });
 
@@ -26,10 +27,9 @@ export const sendEmail = async (
   subject: string,
   message: string
 ) => {
-  // For simulation, log message instead of sending an email
   // send email
   await transporter.sendMail({
-    from: "your_email@gmail.com",
+    from: ENVS.CRON_EMAIL,
     to: email,
     subject: subject,
     text: message,

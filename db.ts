@@ -42,17 +42,22 @@ export class VirtualDatabase {
     body: any
   ) => {
     console.log(`[POST]: Fetching data from ${table}...`);
-    //   fetch data from the database
-    const response = await fetch(this.endpoint + `/${table}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-    return response.json();
+    // fetch data from the database
+    try {
+      const response = await fetch(this.endpoint + `/tables/${table}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error(`[POST]: Error fetching data from ${table}...`);
+      throw new Error(`Error: ${error}`);
+    }
   };
 
   /**

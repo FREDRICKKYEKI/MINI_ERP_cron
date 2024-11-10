@@ -30,17 +30,23 @@ class VirtualDatabase {
          * */
         this.fetchFromDb = (access_token, table, body) => __awaiter(this, void 0, void 0, function* () {
             console.log(`[POST]: Fetching data from ${table}...`);
-            //   fetch data from the database
-            const response = yield fetch(this.endpoint + `/${table}`, {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${access_token}`,
-                    Accept: "application/json",
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(body),
-            });
-            return response.json();
+            // fetch data from the database
+            try {
+                const response = yield fetch(this.endpoint + `/tables/${table}`, {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                        Accept: "application/json",
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(body),
+                });
+                return yield response.json();
+            }
+            catch (error) {
+                console.error(`[POST]: Error fetching data from ${table}...`);
+                throw new Error(`Error: ${error}`);
+            }
         });
         /**
          * @description This function fetches all active subscriptions
