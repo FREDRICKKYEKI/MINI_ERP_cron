@@ -13,18 +13,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkSubscriptions = exports.sendEmail = exports.transporter = void 0;
+/**
+ * @description This file contains utility functions used in the application
+ */
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const db_1 = require("./db");
+const config_1 = require("./config");
 // Configure nodemailer transporter if actually sending emails
 /**
  * @description This is a nodemailer transporter that uses Gmail to send emails
- * NOTE: To use this, you need to enable "Less secure app access" in your Gmail account
  */
 exports.transporter = nodemailer_1.default.createTransport({
-    service: "gmail",
+    service: "", // ENVS.CRON_EMAIL_SERVICE,
     auth: {
-        user: "your_email@gmail.com",
-        pass: "your_password",
+        user: config_1.ENVS.CRON_EMAIL,
+        pass: config_1.ENVS.CRON_EMAIL_PASSWORD,
     },
 });
 /** Function to send email (or simulate email sending)
@@ -35,16 +38,23 @@ exports.transporter = nodemailer_1.default.createTransport({
  * @returns Promise<void>
  * */
 const sendEmail = (email, subject, message) => __awaiter(void 0, void 0, void 0, function* () {
-    // For simulation, log message instead of sending an email
     // send email
     yield exports.transporter.sendMail({
-        from: "your_email@gmail.com",
+        from: config_1.ENVS.CRON_EMAIL,
         to: email,
         subject: subject,
         text: message,
     });
 });
 exports.sendEmail = sendEmail;
+const updateDB = (subscription) => __awaiter(void 0, void 0, void 0, function* () {
+    const db = new db_1.VirtualDatabase();
+    const data = yield db.Subscription.update({ status: "expired" }, { where: { id: subscription.id } });
+    if (data.status !== "200") {
+        throw new Error(`Failed to update subscription status for ${subscription.id}`);
+    }
+    return data;
+});
 /**
  * @description This function checks all active subscriptions and sends reminders to users
  */
@@ -65,6 +75,10 @@ const checkSubscriptions = () => __awaiter(void 0, void 0, void 0, function* () 
             // Check if subscription expires today
             if (expiryDate.toDateString() === today.toDateString()) {
                 (0, exports.sendEmail)(email, "Subscription Expired", `Hello ${name}, your subscription has expired today.`);
+                // Update subscription status to expired
+                updateDB(subscription).then((data) => {
+                    console.log("Subscription status updated to expired");
+                });
             }
             // Check if subscription expires in five days
             else if (expiryDate.toDateString() === fiveDaysFromNow.toDateString()) {

@@ -31,23 +31,18 @@ export class VirtualDatabase {
 
   /**
    * @description This function fetches data from the database
-   * @param access_token
    * @param table
    * @param body
    * @returns Promise<any>
    * */
-  private fetchFromDb = async (
-    access_token: string,
-    table: string,
-    body: any
-  ) => {
+  private fetchFromDb = async (table: string, body: any) => {
     console.log(`[POST]: Fetching data from ${table}...`);
     // fetch data from the database
     try {
       const response = await fetch(this.endpoint + `/tables/${table}`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${access_token}`,
+          Authorization: `Bearer ${this.access_token}`,
           Accept: "application/json",
           "Content-Type": "application/json",
         },
@@ -60,18 +55,49 @@ export class VirtualDatabase {
     }
   };
 
+  private updateDb = async (endpoint: string, body: any) => {
+    console.log(`[POST]: Updating data...`);
+    // fetch data from the database
+    try {
+      const response = await fetch(this.endpoint + `/tables/${endpoint}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.access_token}`,
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error(`[POST]: Error updating data...`);
+      throw new Error(`Error: ${error}`);
+    }
+  };
+
   /**
    * @description This function fetches all active subscriptions
    */
   public Subscription = {
+    /**
+     * @description This function fetches all active subscriptions
+     * @param options - Query options
+     * @returns Promise<SubscriptionType[]>
+     */
     async findAll(options: any): Promise<SubscriptionType[]> {
       const instance = new VirtualDatabase();
+      return instance.fetchFromDb("subscriptions", options);
+    },
+    /**
+     * @description This function updates a subscription
+     * @param body - Subscription data to update
+     * @param options - Query options
+     * @returns Promise<>
+     */
+    async update(col: any, options: any): Promise<any> {
+      const instance = new VirtualDatabase();
 
-      return instance.fetchFromDb(
-        instance.access_token,
-        "subscriptions",
-        options
-      );
+      return instance.updateDb("subscriptions/update", { col, options });
     },
   };
 }

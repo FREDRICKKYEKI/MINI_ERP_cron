@@ -20,7 +20,13 @@ if (
   !CRON_EMAIL ||
   !CRON_EMAIL_PASSWORD
 ) {
-  console.debug({ CRON_SECRET_KEY, BACKEND_URL, CRON_ENDPOINT });
+  console.debug({
+    CRON_SECRET_KEY,
+    BACKEND_URL,
+    CRON_ENDPOINT,
+    CRON_EMAIL,
+    CRON_EMAIL_PASSWORD,
+  });
   throw new Error("Some environment variables are missing");
 }
 

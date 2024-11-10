@@ -23,19 +23,18 @@ class VirtualDatabase {
         this.endpoint = config_1.ENVS.CRON_BACKEND_URL;
         /**
          * @description This function fetches data from the database
-         * @param access_token
          * @param table
          * @param body
          * @returns Promise<any>
          * */
-        this.fetchFromDb = (access_token, table, body) => __awaiter(this, void 0, void 0, function* () {
+        this.fetchFromDb = (table, body) => __awaiter(this, void 0, void 0, function* () {
             console.log(`[POST]: Fetching data from ${table}...`);
             // fetch data from the database
             try {
                 const response = yield fetch(this.endpoint + `/tables/${table}`, {
                     method: "POST",
                     headers: {
-                        Authorization: `Bearer ${access_token}`,
+                        Authorization: `Bearer ${this.access_token}`,
                         Accept: "application/json",
                         "Content-Type": "application/json",
                     },
@@ -48,14 +47,51 @@ class VirtualDatabase {
                 throw new Error(`Error: ${error}`);
             }
         });
+        this.updateDb = (endpoint, body) => __awaiter(this, void 0, void 0, function* () {
+            console.log(`[POST]: Updating data...`);
+            // fetch data from the database
+            try {
+                const response = yield fetch(this.endpoint + `/tables/${endpoint}`, {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${this.access_token}`,
+                        Accept: "application/json",
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(body),
+                });
+                return yield response.json();
+            }
+            catch (error) {
+                console.error(`[POST]: Error updating data...`);
+                throw new Error(`Error: ${error}`);
+            }
+        });
         /**
          * @description This function fetches all active subscriptions
          */
         this.Subscription = {
+            /**
+             * @description This function fetches all active subscriptions
+             * @param options - Query options
+             * @returns Promise<SubscriptionType[]>
+             */
             findAll(options) {
                 return __awaiter(this, void 0, void 0, function* () {
                     const instance = new VirtualDatabase();
-                    return instance.fetchFromDb(instance.access_token, "subscriptions", options);
+                    return instance.fetchFromDb("subscriptions", options);
+                });
+            },
+            /**
+             * @description This function updates a subscription
+             * @param body - Subscription data to update
+             * @param options - Query options
+             * @returns Promise<>
+             */
+            update(col, options) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const instance = new VirtualDatabase();
+                    return instance.updateDb("subscriptions/update", { col, options });
                 });
             },
         };

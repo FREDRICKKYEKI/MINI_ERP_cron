@@ -1,3 +1,6 @@
+/**
+ * @description This file contains utility functions used in the application
+ */
 import nodemailer from "nodemailer";
 import { VirtualDatabase } from "./db";
 import { ENVS } from "./config";
@@ -5,10 +8,9 @@ import { ENVS } from "./config";
 // Configure nodemailer transporter if actually sending emails
 /**
  * @description This is a nodemailer transporter that uses Gmail to send emails
- * NOTE: To use this, you need to enable "Less secure app access" in your Gmail account
  */
 export const transporter = nodemailer.createTransport({
-  service: "roundcube",
+  service: "", // ENVS.CRON_EMAIL_SERVICE,
   auth: {
     user: ENVS.CRON_EMAIL,
     pass: ENVS.CRON_EMAIL_PASSWORD,
@@ -34,6 +36,20 @@ export const sendEmail = async (
     subject: subject,
     text: message,
   });
+};
+
+const updateDB = async (subscription: any) => {
+  const db = new VirtualDatabase();
+  const data = await db.Subscription.update(
+    { status: "expired" },
+    { where: { id: subscription.id } }
+  );
+  if (data.status !== "200") {
+    throw new Error(
+      `Failed to update subscription status for ${subscription.id}`
+    );
+  }
+  return data;
 };
 
 /**
@@ -67,6 +83,10 @@ export const checkSubscriptions = async () => {
           "Subscription Expired",
           `Hello ${name}, your subscription has expired today.`
         );
+        // Update subscription status to expired
+        updateDB(subscription).then((data) => {
+          console.log("Subscription status updated to expired");
+        });
       }
       // Check if subscription expires in five days
       else if (expiryDate.toDateString() === fiveDaysFromNow.toDateString()) {
