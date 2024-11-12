@@ -4,7 +4,7 @@
   "description": "Contains cron job(s) for the MINI ERP project.",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node dist/dev_test.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsc && npx nodemon"
   },

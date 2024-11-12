@@ -42,7 +42,7 @@ This service is a Node.js cron job that periodically checks user subscriptions a
 ## Configuration
 
 1. **Database**: Ensure the database (`db.sqlite` or your preferred DB) is initialized with tables for `users` and `subscriptions`. Refer to the SQL schema files for structure if needed.
-2. **Email Provider**: Configure the email provider in the `nodemailer` setup in `mailer.js` or similar. Make sure to set the `service` field to match your email provider, e.g., `"Gmail"` or `"Roundcube"`.
+2. **Email Provider**: Configure the email provider in the `nodemailer` setup in `mailer.js` or similar. Make sure to set the `service` field to match your email provider, e.g., `"Gmail" etc...`.
 
 ## Usage
 

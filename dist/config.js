@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ENVS = void 0;
+exports.emailSettings = exports.ENVS = void 0;
 const dotenv_1 = require("dotenv");
 // Load environment variables
 console.debug("Loading environment variables...");
@@ -33,4 +33,13 @@ exports.ENVS = {
     CRON_BACKEND_URL,
     CRON_EMAIL,
     CRON_EMAIL_PASSWORD,
+};
+exports.emailSettings = {
+    host: "fredrickkyeki.tech",
+    port: 465,
+    secure: true,
+    auth: {
+        user: CRON_EMAIL,
+        pass: CRON_EMAIL_PASSWORD,
+    },
 };

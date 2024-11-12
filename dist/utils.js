@@ -23,13 +23,7 @@ const config_1 = require("./config");
 /**
  * @description This is a nodemailer transporter that uses Gmail to send emails
  */
-exports.transporter = nodemailer_1.default.createTransport({
-    service: "", // ENVS.CRON_EMAIL_SERVICE,
-    auth: {
-        user: config_1.ENVS.CRON_EMAIL,
-        pass: config_1.ENVS.CRON_EMAIL_PASSWORD,
-    },
-});
+exports.transporter = nodemailer_1.default.createTransport(config_1.emailSettings);
 /** Function to send email (or simulate email sending)
  * @param email - Email address of the recipient
  * @param subject - Subject of the email
@@ -37,7 +31,8 @@ exports.transporter = nodemailer_1.default.createTransport({
  * @throws Error if sending email fails
  * @returns Promise<void>
  * */
-const sendEmail = (email, subject, message) => __awaiter(void 0, void 0, void 0, function* () {
+const sendEmail = (_a) => __awaiter(void 0, [_a], void 0, function* ({ email, subject, message, }) {
+    console.debug(`Sending email to "${email}"...`);
     // send email
     yield exports.transporter.sendMail({
         from: config_1.ENVS.CRON_EMAIL,
@@ -74,7 +69,11 @@ const checkSubscriptions = () => __awaiter(void 0, void 0, void 0, function* () 
             const expiryDate = new Date(expiry_date);
             // Check if subscription expires today
             if (expiryDate.toDateString() === today.toDateString()) {
-                (0, exports.sendEmail)(email, "Subscription Expired", `Hello ${name}, your subscription has expired today.`);
+                (0, exports.sendEmail)({
+                    email: email,
+                    subject: "Subscription Expired",
+                    message: `Hello ${name}, your subscription has expired today.`,
+                });
                 // Update subscription status to expired
                 updateDB(subscription).then((data) => {
                     console.log("Subscription status updated to expired");
@@ -82,7 +81,11 @@ const checkSubscriptions = () => __awaiter(void 0, void 0, void 0, function* () 
             }
             // Check if subscription expires in five days
             else if (expiryDate.toDateString() === fiveDaysFromNow.toDateString()) {
-                (0, exports.sendEmail)(email, "Subscription Expiring Soon", `Hello ${name}, your subscription will expire in 5 days.`);
+                (0, exports.sendEmail)({
+                    email: email,
+                    subject: "Subscription Expiring Soon",
+                    message: `Hello ${name}, your subscription will expire in 5 days.`,
+                });
             }
         });
     }

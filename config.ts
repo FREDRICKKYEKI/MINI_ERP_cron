@@ -37,3 +37,13 @@ export const ENVS = {
   CRON_EMAIL,
   CRON_EMAIL_PASSWORD,
 };
+
+export const emailSettings = {
+  host: "fredrickkyeki.tech",
+  port: 465,
+  secure: true,
+  auth: {
+    user: CRON_EMAIL,
+    pass: CRON_EMAIL_PASSWORD,
+  },
+};
